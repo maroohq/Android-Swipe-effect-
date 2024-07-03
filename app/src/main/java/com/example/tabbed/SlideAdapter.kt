@@ -18,8 +18,6 @@ class SlideAdapter(val frag:Fragment) :FragmentStateAdapter(frag) {
             fragment = WeekForecastFragment()
         }
 
-
-        
         fragment.arguments = Bundle().apply {
             putInt(ARG_OBJECT, position + 1) // The object is just an integer.
 

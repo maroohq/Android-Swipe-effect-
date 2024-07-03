@@ -1,6 +1,7 @@
 package com.example.tabbed
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -8,7 +9,13 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.tabbed.placeholder.PlaceholderContent
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
+import com.example.tabbed.ForeCast.DailyForecast
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 
 /**
  * A fragment representing a list of Items.
@@ -16,6 +23,7 @@ import com.example.tabbed.placeholder.PlaceholderContent
 class WeekForecastFragment : Fragment() {
 
     private var columnCount = 1
+    lateinit var dailyForecast :List<DailyForecast>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +46,25 @@ class WeekForecastFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = ItemRecyclerViewAdapter(PlaceholderContent.ITEMS)
+
+                try {
+                CoroutineScope(Dispatchers.IO) .launch{
+                    val response = api.retrofit.getFiveDayTemperature()
+
+                    if (response.isSuccessful)
+                    {
+                        launch(Dispatchers.Main) {
+                            Log.v("response10", "Success")
+                            dailyForecast = response.body()!!.DailyForecasts                         }
+                    }
+                    else { Log.v("response10", response.code().toString().plus(response.message()))}
+
+                }}
+                catch (e: Exception){
+                    Log.v("response10", e.message.toString())
+                }
+                adapter = ItemRecyclerViewAdapter(listOf(1,2,3,4,5))
+                addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
             }
         }
         return view

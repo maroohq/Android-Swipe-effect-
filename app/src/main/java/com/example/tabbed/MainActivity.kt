@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         val fragTran : FragmentTransaction = fragManager.beginTransaction() //start transaction
         fragTran.replace(R.id.frameLayout,fragment) // frameLayout to contain the fragment
         fragTran.commit() //end transaction
-
+        
     }
 
     @SuppressLint("MissingSuperCall")

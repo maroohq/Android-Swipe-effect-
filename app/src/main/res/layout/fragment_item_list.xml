@@ -11,6 +11,6 @@
     app:layoutManager="LinearLayoutManager"
     tools:context=".WeekForecastFragment"
     tools:listitem="@layout/fragment_item"
-    android:background="@drawable/background"
+
 
     />
