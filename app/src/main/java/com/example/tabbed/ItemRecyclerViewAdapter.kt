@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.example.tabbed.ForeCast.DailyForecast
 
 
 import com.example.tabbed.databinding.FragmentItemBinding
@@ -17,7 +18,7 @@ import com.example.tabbed.databinding.FragmentItemBinding
 val arr :List<Int> = listOf<Int>(1,2,3,4,5)
 
 class ItemRecyclerViewAdapter(
-    private val values: List<Int>
+    private val values: List<DailyForecast>
 ) : RecyclerView.Adapter<ItemRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,9 +35,9 @@ class ItemRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = values[position]
-        holder.hotTemp.setText("25")
-        holder.coldTemp.setText("16")
-        holder.dateTemp.setText("25/12/2024")
+        holder.hotTemp.setText(item.Temperature.Maximum.Value.toString())
+        holder.coldTemp.setText(item.Temperature.Minimum.Value.toString())
+        holder.dateTemp.setText(item.Date.substring(0,10))
     }
 
     override fun getItemCount(): Int = values.size

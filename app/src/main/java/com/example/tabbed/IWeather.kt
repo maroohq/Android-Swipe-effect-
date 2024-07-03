@@ -5,6 +5,7 @@ package com.example.tabbed
 import com.example.tabbed.ForeCast.ForeCast
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 
 const val apikey: String = "bRXuwuZSV4Nc4qaqhEtNnOZfThW0mVUA"
@@ -15,3 +16,4 @@ interface IWeather {
     suspend fun getFiveDayTemperature() : Response<ForeCast>
 
 }
+

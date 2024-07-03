@@ -1,5 +1,6 @@
 package com.example.tabbed
 
+import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -9,12 +10,25 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycling
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.tabbed.ForeCast.DailyForecast
+import com.example.tabbed.ForeCast.Day
+import com.example.tabbed.ForeCast.ForeCast
+import com.example.tabbed.ForeCast.Headline
+import com.example.tabbed.ForeCast.Maximum
+import com.example.tabbed.ForeCast.Minimum
+import com.example.tabbed.ForeCast.Night
+import com.example.tabbed.ForeCast.Temperature
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import retrofit2.Response
 
 
 /**
@@ -23,7 +37,9 @@ import kotlinx.coroutines.launch
 class WeekForecastFragment : Fragment() {
 
     private var columnCount = 1
-    lateinit var dailyForecast :List<DailyForecast>
+    lateinit var dailyForecastList :List<DailyForecast>
+    lateinit var  headline: Headline
+    lateinit var  response: Response<ForeCast>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,31 +56,47 @@ class WeekForecastFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_item_list, container, false)
 
         // Set the adapter
-        if (view is RecyclerView) {
-            with(view) {
+        val recView = view.findViewById<RecyclerView>( R.id.list)
+        val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
+
+        if ( recView is RecyclerView) {
+            with(recView) {
                 layoutManager = when {
                     columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
+                    else -> GridLayoutManager(context, columnCount) }
 
-                try {
-                CoroutineScope(Dispatchers.IO) .launch{
-                    val response = api.retrofit.getFiveDayTemperature()
+                    progressBar.setProgress(10,true)
+                    progressBar.isVisible = true
 
-                    if (response.isSuccessful)
-                    {
-                        launch(Dispatchers.Main) {
-                            Log.v("response10", "Success")
-                            dailyForecast = response.body()!!.DailyForecasts                         }
+                    CoroutineScope(Dispatchers.IO).launch {
+                        response = try {
+                            progressBar.setProgress(30,true)
+                            api.retrofit.getFiveDayTemperature()
+
+                        } catch (e: Exception) {
+                            Log.v("response10", e.message.toString())
+                            return@launch
+                        }
+
+
+                        if (response.isSuccessful) {
+                            progressBar.setProgress(50,true)
+                            launch(Dispatchers.Main) {
+                                Log.v("Response10", "sucessful")
+                                dailyForecastList = response.body()!!.DailyForecasts
+                                adapter = ItemRecyclerViewAdapter(dailyForecastList) // Fix this in the adapter
+                                addItemDecoration(DividerItemDecoration(this@with.context, DividerItemDecoration.VERTICAL))
+
+                                Log.v("Response10", "Done")
+                                progressBar.setProgress(100,true)
+                                progressBar.isVisible=false
+                            }
+
+                        } else {
+                            Log.v("Response10", "Error somewhere")
+                        }
                     }
-                    else { Log.v("response10", response.code().toString().plus(response.message()))}
 
-                }}
-                catch (e: Exception){
-                    Log.v("response10", e.message.toString())
-                }
-                adapter = ItemRecyclerViewAdapter(listOf(1,2,3,4,5))
-                addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
             }
         }
         return view
