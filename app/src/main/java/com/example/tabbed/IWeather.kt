@@ -8,7 +8,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 
 
-const val apikey: String = "bRXuwuZSV4Nc4qaqhEtNnOZfThW0mVUA"
+const val apikey: String = "Your api key here"
 
 interface IWeather {
 
